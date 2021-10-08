@@ -15,8 +15,8 @@ function Datasets() {
         promiseFn: getDatasets
     });
 
-    if(isLoading) return <div>Loading...</div>;
-    if(error) return <div>Error!</div>;
+    if(isLoading) return <div>Datasets: Loading...</div>;
+    if(error) return <div>Datasets: Error!</div>;
     if(datasets) return(
         <div>
             <ul>
