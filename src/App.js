@@ -11,7 +11,7 @@ function App() {
         <div>
           <h1>Type /datasets or /featureviews on the address</h1>
           <Route exact path='/datasets' component={Datasets}/>
-          <Route exact path='/featureviews/' component={Featureviews}/>
+          <Route exact path='/featureviews' component={Featureviews}/>
         </div>
       </BrowserRouter>
     </div>
