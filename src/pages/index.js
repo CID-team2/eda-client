@@ -1,4 +1,5 @@
 import Datasets from './Datasets';
-import FeatureViews from './Featureviews';
+import FeatureViews from './FeatureViews';
+import FeatureViewInfo from './FeatureViewInfo';
 
-export { Datasets, FeatureViews };
+export { Datasets, FeatureViews, FeatureViewInfo };

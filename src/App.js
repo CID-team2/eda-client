@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
-import { Datasets, FeatureViews } from './pages';
+import { Datasets, FeatureViews, FeatureViewInfo } from './pages';
 
 function App() {
   return (
@@ -18,8 +18,9 @@ function App() {
         </Link>
 
         <Switch>
-          <Route exact path='/datasets' component={Datasets}/>
-          <Route exact path='/featureviews' component={FeatureViews}/>
+          <Route path='/datasets' component={Datasets}/>
+          <Route path='/featureviews/:featureViewName' component={FeatureViewInfo}/>
+          <Route path='/featureviews' component={FeatureViews}/>
         </Switch>
       </BrowserRouter>
     </div>

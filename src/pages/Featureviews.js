@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAsync } from 'react-async';
+import FeatureViewInfo from './FeatureViewInfo';
 
 async function getFeatureViews() {
     const resp = await axios.get(
-        // `/api/v1/feature-views`
+        `http://3.19.199.190:8080/api/v1/feature-views`
     );
     return resp.data;
 }
 
 function FeatureViews() {
-    // const [featureviewId, setFeatureviewId] = useState(null);
-    const { data: featureviews, error, isLoading } = useAsync({
+    const [featureViewName, setFeatureViewName] = useState(null);
+    const { data: featureViews, error, isLoading } = useAsync({
         promiseFn: getFeatureViews
     });
 
-    if(isLoading) return <div>Featureviews: Loading...</div>;
-    if(error) return <div>Featureviews: Error!</div>;
-    if(featureviews) return(
-        <div>
+    if (isLoading) return <div>Loading FeatureViews...</div>;
+    if (error) return <div>FeatureViews Error!</div>;
+    if (featureViews) return(
+        <>
             <ul>
-                {featureviews.map(featureview => (
-                    <li>{featureview}</li>
+                {featureViews.map(featureView => (
+                    <li
+                        key={featureView}
+                        onClick={() => setFeatureViewName(featureView)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {featureView}
+                    </li>
                 ))}
             </ul>
-        </div>
+            <p>
+                {featureViewName && <FeatureViewInfo name={featureViewName}/>}
+            </p>
+        </>
     );
     return null;
 }
