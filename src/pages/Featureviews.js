@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link, Route } from 'react-router-dom';
 import axios from 'axios';
 import { useAsync } from 'react-async';
 import FeatureViewInfo from './FeatureViewInfo';
@@ -10,30 +11,40 @@ async function getFeatureViews() {
     return resp.data;
 }
 
-function FeatureViews() {
-    const [featureViewName, setFeatureViewName] = useState(null);
+function FeatureViewList({ featureViews }) {
+    return(
+        <>
+            <h1>Feature Views</h1>
+            <ul>
+                {featureViews.map(featureViewName => (
+                    <li key={featureViewName}>
+                        <Link to={`/featureviews/${featureViewName}`}>
+                            {featureViewName}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </>
+    );
+}
+
+function FeatureViews({ match }) {
     const { data: featureViews, error, isLoading } = useAsync({
         promiseFn: getFeatureViews
     });
 
-    if (isLoading) return <div>Loading FeatureViews...</div>;
-    if (error) return <div>FeatureViews Error!</div>;
+    if (isLoading) return <>Loading FeatureViews...</>;
+    if (error) return <>FeatureViews Error!</>;
     if (featureViews) return(
         <>
-            <ul>
-                {featureViews.map(featureView => (
-                    <li
-                        key={featureView}
-                        onClick={() => setFeatureViewName(featureView)}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        {featureView}
-                    </li>
-                ))}
-            </ul>
-            <p>
-                {featureViewName && <FeatureViewInfo name={featureViewName}/>}
-            </p>
+            <Route
+                exact path={match.path}
+                render={() => <FeatureViewList featureViews={featureViews}/>}
+            />
+            <Route
+                path={`${match.path}/:featureviewname`}
+                component={FeatureViewInfo}
+            />
         </>
     );
     return null;

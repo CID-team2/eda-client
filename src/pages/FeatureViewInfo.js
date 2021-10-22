@@ -1,45 +1,76 @@
 import React from 'react';
+import { Link, Route } from 'react-router-dom';
 import axios from 'axios';
 import { useAsync } from 'react-async';
+import Statistic from './Statistic';
 
-async function getFeatureViewInfo({ name }) {
+async function getFeatureViewInfo({ featureViewName }) {
     const resp = await axios.get(
-        `http://3.19.199.190:8080/api/v1/feature-views/${name}`
+        `http://3.19.199.190:8080/api/v1/feature-views/${featureViewName}`
     );
     return resp.data;
 }
 
-function FeatureViewInfo({ name }) {
-
-    const { data: featureView, error, isLoading } = useAsync({
-        promiseFn: getFeatureViewInfo,
-        name,
-        watch: name
-    });
-
-    if (isLoading) return <div>Loading FeatureView Info...</div>;
-    if (error) return <div>FeatureViewInfo Error!</div>;
-    if (featureView) return(
-        <div>
-            <h2>{name}</h2>
+function FeatureTable({ featureViewInfo }) {
+    const featureViewName = featureViewInfo.name;
+    const features = featureViewInfo.features;
+    const columns = [
+        'Name',
+        'Dataset',
+        'Column',
+        'Data Type',
+        'Feature Type'
+    ];
+    return(
+        <>
+            <h2>{featureViewName}</h2>
             <h3>Features</h3>
             <table border='1'>
-                <th>Name</th>
-                <th>Dataset</th>
-                <th>Column</th>
-                <th>Data Type</th>
-                <th>Feature Type</th>
-                {featureView.features.map(feature => (
+                <thead>
                     <tr>
-                        <td>{feature.name}</td>
-                        <td>{feature.dataset_name}</td>
-                        <td>{feature.column_name}</td>
-                        <td>{feature.data_type}</td>
-                        <td>{feature.feature_type}</td>
+                        {columns.map((column) =>
+                            <th key={column}>{column}</th>
+                        )}
                     </tr>
-                ))}
+                </thead>
+                <tbody>
+                    {features.map(feature => (
+                        <tr key={feature.name}>
+                            <td>
+                                <Link to={`/featureviews/${featureViewName}/statistic?feature=${feature.name}`}>
+                                    {feature.name}
+                                </Link>
+                            </td>
+                            <td>{feature.dataset_name}</td>
+                            <td>{feature.column_name}</td>
+                            <td>{feature.data_type}</td>
+                            <td>{feature.feature_type}</td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
-        </div>
+        </>
+    );
+}
+
+function FeatureViewInfo({ match }) {
+    const featureViewName = match.params.featureviewname;
+
+    const { data: featureViewInfo, error, isLoading } = useAsync({
+        promiseFn: getFeatureViewInfo,
+        featureViewName
+    });
+
+    if (isLoading) return <>Loading FeatureViewInfo...</>;
+    if (error) return <>FeatureViewInfo Error!</>;
+    if (featureViewInfo) return(
+        <>
+            <FeatureTable featureViewInfo = {featureViewInfo}/>
+            <Route
+                path={`${match.path}/statistic`}
+                component={Statistic}
+            />
+        </>
     );
     return null;
 }
