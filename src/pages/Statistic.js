@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { URL_BASE } from './';
 
 function Statistic({ match, location }) {
     const [loading, setLoading] = useState(false);
@@ -12,7 +13,7 @@ function Statistic({ match, location }) {
                 const featureViewName = match.params.featureviewname;
                 const request = `${featureViewName}/statistic${location.search}`;
                 const response = await axios.get(
-                    `http://3.19.199.190:8080/api/v1/feature-views/${request}`
+                    `${URL_BASE}/feature-views/${request}`
                 );
                 setData(response.data);
             } catch (e) {

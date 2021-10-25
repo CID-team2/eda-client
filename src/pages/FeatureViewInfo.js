@@ -2,11 +2,11 @@ import React from 'react';
 import { Link, Route } from 'react-router-dom';
 import axios from 'axios';
 import { useAsync } from 'react-async';
-import Statistic from './Statistic';
+import { URL_BASE, Statistic } from './';
 
 async function getFeatureViewInfo({ featureViewName }) {
     const resp = await axios.get(
-        `http://3.19.199.190:8080/api/v1/feature-views/${featureViewName}`
+        `${URL_BASE}/feature-views/${featureViewName}`
     );
     return resp.data;
 }
