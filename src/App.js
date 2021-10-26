@@ -1,12 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
-import Chart from './charts/Chart.js'
+import Boxplot from './charts/Chart.js'
 
 function App() {
   return (
-    <div className="App">
+    <div style={{width: "1000px"}}>
       
-      <Chart/>
+      <Boxplot/>
       
     </div>
   );
