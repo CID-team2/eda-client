@@ -1,18 +1,17 @@
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import axios from 'axios'
 import HighchartsMore from 'highcharts/highcharts-more'
 
 HighchartsMore(Highcharts);
 
-function getChart() {
+function getBoxplot({lowerOutliers, lowerWhisker, q1, q2, q3, upperWhisker, upperOutliers}) {
     return {
         chart: {
             type: 'boxplot'
         },
     
         title: {
-            text: 'Highcharts Box Plot Example'
+            text: undefined
         },
     
         legend: {
@@ -20,33 +19,30 @@ function getChart() {
         },
     
         xAxis: {
-            categories: ['1'],
-            title: {
-                text: 'Experiment No.'
-            }
+            visible: false
         },
-    
+
         yAxis: {
             title: {
-                text: 'Observations'
+                text: undefined
             }
         },
     
         series: [{
-            name: 'Observations',
+            name: undefined,
             data: [
-                [760, 801, 848, 895, 965]
+                [lowerWhisker, q1, q2, q3, upperWhisker]
             ],
             tooltip: {
-                headerFormat: '<em>Experiment No {point.key}</em><br/>'
+                headerFormat: 'tooltip: not implemented'
             }
         }, {
             name: 'Outliers',
             color: Highcharts.getOptions().colors[0],
             type: 'scatter',
-            data: [ // x, y positions where 0 is the first category
-                [0, 644]
-            ],
+            data:  // x, y positions where 0 is the first category
+                lowerOutliers.concat(upperOutliers).map(x => [0, x])
+            ,
             marker: {
                 fillColor: 'white',
                 lineWidth: 1,
@@ -59,9 +55,9 @@ function getChart() {
       }
 }
 
-function Boxplot (){
+function Boxplot (dict){
     return (
-        <HighchartsReact highcharts={Highcharts} options= {getChart()}/>
+        <HighchartsReact highcharts={Highcharts} options= {getBoxplot(dict)}/>
     )
 }
 export default Boxplot;

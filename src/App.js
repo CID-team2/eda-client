@@ -6,7 +6,7 @@ function App() {
   return (
     <div style={{width: "1000px"}}>
       
-      <Boxplot/>
+      <Boxplot lowerOutliers={[644]} lowerWhisker={760} q1={801} q2={848} q3={895} upperWhisker={965}/>
       
     </div>
   );
