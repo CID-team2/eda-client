@@ -37,7 +37,7 @@ function FeatureTable({ featureViewInfo }) {
                     {features.map(feature => (
                         <tr key={feature.name}>
                             <td>
-                                <Link to={`/featureviews/${featureViewName}/statistic?feature=${feature.name}`}>
+                                <Link to={`/featureviews/${featureViewName}/statistic?feature=${feature.name}&statistic=boxplot`}>
                                     {feature.name}
                                 </Link>
                             </td>

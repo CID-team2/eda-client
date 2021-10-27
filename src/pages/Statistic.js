@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { URL_BASE } from './';
+import Boxplot from '../charts/Chart.js';
 
 function Statistic({ match, location }) {
     const [loading, setLoading] = useState(false);
@@ -36,6 +37,7 @@ function Statistic({ match, location }) {
                         {stat}: {basic[stat] || 'Unknown'}
                     </h4>
                 )}
+                <Boxplot dict={data.statistics.boxplot} />
             </>
         );
     }
