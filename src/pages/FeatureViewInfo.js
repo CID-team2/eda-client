@@ -37,7 +37,7 @@ function FeatureTable({ featureViewInfo }) {
                     {features.map(feature => (
                         <tr key={feature.name}>
                             <td>
-                                <Link to={`/featureviews/${featureViewName}/statistic?feature=${feature.name}`}>
+                                <Link to={`/feature-views/${featureViewName}/statistic?feature=${feature.name}`}>
                                     {feature.name}
                                 </Link>
                             </td>
@@ -54,7 +54,7 @@ function FeatureTable({ featureViewInfo }) {
 }
 
 function FeatureViewInfo({ match }) {
-    const featureViewName = match.params.featureviewname;
+    const featureViewName = match.params.feature_view_name;
 
     const { data: featureViewInfo, error, isLoading } = useAsync({
         promiseFn: getFeatureViewInfo,
