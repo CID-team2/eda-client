@@ -18,7 +18,7 @@ function FeatureViewList({ featureViews }) {
             <ul>
                 {featureViews.map(featureViewName => (
                     <li key={featureViewName}>
-                        <Link to={`/featureviews/${featureViewName}`}>
+                        <Link to={`/feature-views/${featureViewName}`}>
                             {featureViewName}
                         </Link>
                     </li>
@@ -42,7 +42,7 @@ function FeatureViews({ match }) {
                 render={() => <FeatureViewList featureViews={featureViews}/>}
             />
             <Route
-                path={`${match.path}/:featureviewname`}
+                path={`${match.path}/:feature_view_name`}
                 component={FeatureViewInfo}
             />
         </>

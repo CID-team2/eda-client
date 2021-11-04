@@ -10,7 +10,7 @@ const Menu = () => { return (
       <Link to='/datasets'>
         <button>Datasets</button>
       </Link>
-      <Link to='/featureviews'>
+      <Link to='/feature-views'>
         <button>Feature Views</button>
       </Link>
     </>
@@ -34,7 +34,7 @@ function App() {
 
         <Switch>
           <Route path='/datasets' component={Datasets}/>
-          <Route path='/featureviews' component={FeatureViews}/>
+          <Route path='/feature-views' component={FeatureViews}/>
         </Switch>
         
         <Route component={goBackButton}/>
