@@ -1,31 +1,51 @@
-// import React, { useState } from 'react';
 import React from 'react';
+import { Link, Route } from 'react-router-dom';
 import axios from 'axios';
 import { useAsync } from 'react-async';
+import { URL_BASE, DatasetInfo } from './';
 
 async function getDatasets() {
     const resp = await axios.get(
-        // `/api/v1/datasets`
+        `${URL_BASE}/datasets`
     );
     return resp.data;
 }
 
-function Datasets() {
-    // const [datasetId, setDatasetId] = useState(null);
+function DatasetList({ datasets }) {
+    return(
+        <>
+            <h1>Datasets</h1>
+            <ul>
+                {datasets.map(datasetName => (
+                    <li key={datasetName}>
+                        <Link to={`/datasets/${datasetName}`}>
+                            {datasetName}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </>
+    );
+}
+
+function Datasets({ match }) {
     const { data: datasets, error, isLoading } = useAsync({
         promiseFn: getDatasets
     });
 
-    if(isLoading) return <div>Datasets: Loading...</div>;
-    if(error) return <div>Datasets: Error!</div>;
+    if(isLoading) return <>Loading Datasets...</>;
+    if(error) return <>Datasets Error!</>;
     if(datasets) return(
-        <div>
-            <ul>
-                {datasets.map(dataset => (
-                    <li>{dataset}</li>
-                ))}
-            </ul>
-        </div>
+        <>
+            <Route
+                exact path={match.path}
+                render={() => <DatasetList datasets={datasets}/>}
+            />
+            <Route
+                path={`${match.path}/:dataset_name`}
+                component={DatasetInfo}
+            />
+        </>
     );
     return null;
 }
