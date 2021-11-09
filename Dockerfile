@@ -1,12 +1,13 @@
-# syntax=docker/dockerfile:1
-
-FROM node:14.17.6
-RUN mkdir /app
+FROM node:14-alpine as build
+RUN apk add --no-cache git
+RUN git clone -b routing https://github.com/CID-team2/eda-client.git /app
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json /app/package.json
-RUN npm install --silent
-RUN npm install react-scripts -g --silent
+RUN yarn install --production --silent
+RUN yarn global add react-scripts@3.4.1 --silent
+RUN yarn run build
 
-COPY . /app
-CMD ["npm", "start"]
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
