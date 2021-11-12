@@ -3,39 +3,54 @@ import axios from 'axios';
 import { URL_BASE } from './';
 // import Boxplot from '../charts/Chart.js';
 
-function Statistic({ match, location }) {
+function Statistic({ featureViewName, featureName, chartType }) {
+    const basicStatURL = `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}`;
+    const chartStatURL = chartType ? `${basicStatURL}&statistic=${chartType}` : null;
+
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    // const [chart, setChart] = useState(null);
+    const [basicStat, setBasicStat] = useState(null);
+    const [chartStat, setChartStat] = useState(null);
 
     useEffect(() => {
-        const fetch = async () => {
+        async function getBasicStatistic() {
             setLoading(true);
             try {
-                const response = await axios.get(
-                    `${URL_BASE}/${match.url}${location.search}`
-                );
-                setData(response.data);
-                // TODO: parse query string and set chart state
+                const response = await axios.get(basicStatURL);
+                setBasicStat(response.data);
             } catch (e) {
-                // console.log(e);
-                return <>Statistic Error!</>
+                return <>Basic Statistic Error!</>
             }
             setLoading(false);
         };
-        fetch();
-    }, [match, location]);
+        getBasicStatistic();
+    }, [basicStatURL]);
+
+    useEffect(() => {
+        async function getChartStatistic() {
+            if (chartStatURL) {
+                setLoading(true);
+                try {
+                    const response = await axios.get(chartStatURL);
+                    setChartStat(response.data);
+                } catch (e) {
+                    return <>Chart Statistic Error!</>
+                }
+                setLoading(false);
+            }
+        };
+        getChartStatistic();
+    }, [chartStatURL]);
 
     if (loading) return <>Loading Statistic...</>;
-    if (data) {
+    if (basicStat) {
         return(
             <>
-                {Object.keys(data).map((stat) =>
+                {Object.keys(basicStat).map((stat) =>
                     <h4 key={stat}>
-                        {stat}: {data[stat] || 'Unknown'}
+                        {stat}: {basicStat[stat] || 'Unknown'}
                     </h4>
                 )}
-                {/* <Boxplot dict={data} /> */}
+                {/* TODO: render chart component */}
             </>
         );
     }
