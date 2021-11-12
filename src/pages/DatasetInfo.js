@@ -15,18 +15,16 @@ async function getDatasetInfoExamples({ datasetName }) {
 
 function DatasetPreview({ datasetInfo, dataSamples }) {
     const columns = datasetInfo.columns;
-    console.log(columns);
     return(
         <>
             <h2>{datasetInfo.name}</h2>
             <h3>Source: {datasetInfo.source || 'Unknown'}</h3>
-            {/* <h6>Created at: {datasetInfo.created_at || 'Unknown'}</h6> */}
-            {/* <h6>Last modified at: {datasetInfo.modified_at || 'Unknown'}</h6> */}
             <h3>Columns</h3>
             <table border='1'>
                 {columns.map(column => (
                     <tr key={column.name}>
                         <td>{column.name}</td>
+                        <td>{column.data_type}</td>
                         {dataSamples[column.name].map(value => (
                             <td>{value}</td>
                         ))}

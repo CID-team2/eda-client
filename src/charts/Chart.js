@@ -4,7 +4,7 @@ import HighchartsMore from 'highcharts/highcharts-more'
 
 HighchartsMore(Highcharts);
 
-function getBoxplot({lowerOutliers, lowerWhisker, q1, q2, q3, upperWhisker, upperOutliers}) {
+function getBoxplot(dict) {
     return {
         chart: {
             type: 'boxplot'
@@ -31,7 +31,7 @@ function getBoxplot({lowerOutliers, lowerWhisker, q1, q2, q3, upperWhisker, uppe
         series: [{
             name: undefined,
             data: [
-                [lowerWhisker, q1, q2, q3, upperWhisker]
+                [dict.lowerWhisker, dict.q1, dict.q2, dict.q3, dict.upperWhisker]
             ],
             tooltip: {
                 headerFormat: 'tooltip: not implemented'
@@ -41,7 +41,7 @@ function getBoxplot({lowerOutliers, lowerWhisker, q1, q2, q3, upperWhisker, uppe
             color: Highcharts.getOptions().colors[0],
             type: 'scatter',
             data:  // x, y positions where 0 is the first category
-                lowerOutliers.concat(upperOutliers).map(x => [0, x])
+                dict.lowerOutliers.concat(dict.upperOutliers).map(x => [0, x])
             ,
             marker: {
                 fillColor: 'white',
