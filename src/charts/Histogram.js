@@ -4,7 +4,7 @@ import HighchartsReact from 'highcharts-react-official'
 function getIntervalList(boundaries) {
     let intervalList = [];
     for (let i = 0; i < boundaries.length - 1; i++) {
-        intervalList.push(`${boundaries[i]}~${boundaries[i+1]}`);
+        intervalList.push(`${boundaries[i]} ~ ${boundaries[i+1]}`);
     }
     return intervalList;
 }
@@ -16,18 +16,34 @@ function Histogram({ dict }) {
             chart: {
                 type: 'column'
             },
+            title: {
+                text: undefined
+            },
             xAxis: {
                 categories: getIntervalList(dict.boundaries)
             },
-            plotOptions: {
-                series: {
-                    pointPadding: 0,
-                    groupPadding: 0,
-                    borderWidth: 0,
-                    shadow: false
+            yAxis: {
+                title: {
+                    text: ''
                 }
             },
-            series: dict.numbers
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    shadow: false,
+                    dataLabels: {
+                        enabled: true,
+                        inside: true
+                    }
+                }
+            },
+            tooltip: {
+                enabled: false
+            },
+            series: [{
+                data: dict.numbers,
+                showInLegend: false
+            }]
         }}
     />);
 }
