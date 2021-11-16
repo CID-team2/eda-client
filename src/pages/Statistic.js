@@ -19,6 +19,7 @@ function Statistic({ featureViewName, featureName }) {
                 );
                 setBasicStat(response.data);
             } catch (e) {
+                setBasicLoading(false);
                 return <>Basic Statistic Error!</>
             }
             setBasicLoading(false);
@@ -37,6 +38,7 @@ function Statistic({ featureViewName, featureName }) {
                     setChartStat(response.data);
                 }
             } catch (e) {
+                setChartLoading(false);
                 return <>Chart Statistic Error!</>
             }
             setChartLoading(false);
@@ -63,23 +65,24 @@ function Statistic({ featureViewName, featureName }) {
             </p>
             <>
                 {basicLoading ? <>Loading basic statistic...</> :
-                basicStat &&
-                <ul>
-                {Object.keys(basicStat).map((stat) =>
-                    <li key={stat}>
-                        <strong>{stat}: </strong>
-                        {basicStat[stat] !== null ? basicStat[stat] : 'Unknown'}
-                    </li>
-                )}
-                </ul>}
+                    basicStat && <>
+                        {Object.keys(basicStat).map((stat) =>
+                            <div>
+                                <strong>{stat}: </strong>
+                                {basicStat[stat] !== null ? basicStat[stat] : 'Unknown'}
+                            </div>
+                        )}
+                    </>
+                }
             </>
             <>
                 {chartLoading ? <>Loading chart...</> :
-                chartStat &&
-                <>
-                    {chartType === 'boxplot' && <Charts.Boxplot dict={chartStat} />}
-                    {chartType === 'histogram' && <Charts.Histogram dict={chartStat} />}
-                </>}
+                    chartStat &&
+                        <div>
+                            {chartType === 'boxplot' && <Charts.Boxplot dict={chartStat} />}
+                            {chartType === 'histogram' && <Charts.Histogram dict={chartStat} />}
+                        </div>
+                }
             </>
         </>
     );
