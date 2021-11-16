@@ -21,7 +21,6 @@ function FeatureViewInfo({ match }) {
     ];
 
     const [featureName, setFeatureName] = useState(null);
-    const [chartType, setChartType] = useState(null);
     
     const { data: featureViewInfo, error, isLoading } = useAsync({
         promiseFn: getFeatureViewInfo,
@@ -58,23 +57,11 @@ function FeatureViewInfo({ match }) {
                     ))}
                 </tbody>
             </table>
-            
-            {/* TODO: chart options (e.g., a dropdown menu) */}
-            {/* an array of buttons for now... */}
-            <div>
-                <button onClick={() => setChartType('boxplot')}>
-                    Boxplot
-                </button>
-                <button onClick={() => setChartType('histogram')}>
-                    Histogram
-                </button>
-            </div>
 
             {featureName &&
                 <Statistic
                     featureViewName={featureViewName}
                     featureName={featureName}
-                    chartType={chartType}
                 />
             }
         </>
