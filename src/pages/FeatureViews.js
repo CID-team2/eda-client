@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Route } from 'react-router-dom';
 import axios from 'axios';
 import { useAsync } from 'react-async';
-import { URL_BASE, FeatureViewInfo } from './';
+import { URL_BASE, FeatureViewInfo, FeatureViewCreate } from './';
 
 async function getFeatureViews() {
     const resp = await axios.get(
@@ -18,7 +18,7 @@ function FeatureViewList({ featureViews }) {
             <ul>
                 {featureViews.map(featureViewName => (
                     <li key={featureViewName}>
-                        <Link to={`/feature-views/${featureViewName}`}>
+                        <Link to={`/feature-views/info/${featureViewName}`}>
                             {featureViewName}
                         </Link>
                     </li>
@@ -42,8 +42,20 @@ function FeatureViews({ match }) {
                 render={() => <FeatureViewList featureViews={featureViews}/>}
             />
             <Route
-                path={`${match.path}/:feature_view_name`}
+                exact path={match.path}
+                render={() => <p>
+                    <Link to='/feature-views/create'>
+                        <button>Create a Feature View</button>
+                    </Link>
+                </p>}
+            />
+            <Route
+                path={`${match.path}/info/:feature_view_name`}
                 component={FeatureViewInfo}
+            />
+            <Route
+                path={`${match.path}/create`}
+                component={FeatureViewCreate}
             />
         </>
     );
