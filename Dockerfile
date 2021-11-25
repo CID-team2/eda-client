@@ -1,13 +1,27 @@
-FROM node:14-alpine as build
-RUN apk add --no-cache git
-RUN git clone -b routing https://github.com/CID-team2/eda-client.git /app
-WORKDIR /app
+FROM centos:7.9.2009
+
+RUN yum update -y && \
+    yum install -y git
+
+RUN curl --silent --location https://rpm.nodesource.com/setup_14.x | bash - && \
+        yum install -y nodejs
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
+        rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
+        yum install -y yarn
+
+RUN git clone https://github.com/CID-team2/eda-client.git /opt/eda-client
+
+ENV PATH /opt/eda-client:$PATH
+
+WORKDIR /opt/eda-client
+
 RUN yarn install --production --silent
 RUN yarn global add react-scripts@3.4.1 --silent
-RUN yarn run build
+RUN yarn build
 
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# disable cache by giving the argument (with time)
+ARG CACHEBUST
+
+RUN git pull
+
+CMD yarn start
