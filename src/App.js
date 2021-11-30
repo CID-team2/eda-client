@@ -1,46 +1,138 @@
-import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
-import { Datasets, FeatureViews } from './pages';
+import axios from 'axios';
+import { useAsync } from 'react-async';
+import { BrowserRouter as Router, NavLink, Route } from 'react-router-dom';
+import {
+	URL_BASE,
+	DatasetInfo,
+	FeatureViewInfo,
+	FeatureViewCreate
+} from './pages';
+import * as Layout from './Layout';
+import { Button, Icon, List, Tab } from 'semantic-ui-react';
 
-const Menu = () => { return (
-    <>
-      <h1>Type /datasets or /featureviews on the address</h1>
-      <h1>or click on one of the buttons below</h1>
-      <Link to='/datasets'>
-        <button>Datasets</button>
-      </Link>
-      <Link to='/feature-views'>
-        <button>Feature Views</button>
-      </Link>
-    </>
-  );
-};
+// TODO:
+// add search on sidebars
 
-const goBackButton = ({ location, history }) => 
-  location.pathname !== '/'
-  ? <>
-      <button onClick={() => { history.goBack(); }}>
-        Previous
-      </button>
-    </>
-  : null;
+async function getDatasets() {
+    const resp = await axios.get(
+        `${URL_BASE}/datasets`
+    );
+    return resp.data;
+}
 
-function App() {
-  return (
-    <div className="App">
-      <Router>
-        <Route exact path='/' component={Menu}/>
+const DatasetList = ({ datasets }) => {
+    return(
+		<List selection divided>
+			{datasets.map(datasetName => (
+				<List.Item key={datasetName}>
+					<NavLink
+						to={`/datasets/${datasetName}`}
+						style={isActive => ({
+							color: isActive ? 'black' : 'gray',
+							fontWeight: isActive ? 'bold' : 'normal'
+						})}
+					>
+						{datasetName}
+					</NavLink>
+				</List.Item>
+			))}
+		</List>
+    );
+}
 
-        <Switch>
-          <Route path='/datasets' component={Datasets}/>
-          <Route path='/feature-views' component={FeatureViews}/>
-        </Switch>
-        
-        <Route component={goBackButton}/>
-      </Router>
-    </div>
-  );
+async function getFeatureViews() {
+    const resp = await axios.get(
+        `${URL_BASE}/feature-views`
+    );
+    return resp.data;
+}
+
+const FeatureViewList = ({ featureViews }) => {
+    return(
+		<List selection divided>
+			{featureViews.map(featureViewName => (
+				<List.Item key={featureViewName}>
+					<NavLink
+						to={`/feature-views/info/${featureViewName}`}
+						style={isActive => ({
+							color: isActive ? 'black' : 'gray',
+							fontWeight: isActive ? 'bold' : 'normal'
+						})}
+					>
+						{featureViewName}
+					</NavLink>
+				</List.Item>
+			))}
+		</List>
+    );
+}
+
+const App = () => {
+	const {
+		data: datasets,
+		datasetsError,
+		datasetsLoading
+	} = useAsync({ promiseFn: getDatasets });
+	const {
+		data: featureViews,
+		featureViewsError,
+		featureViewsLoading
+	} = useAsync({ promiseFn: getFeatureViews });
+	const panes = [{
+		menuItem: 'Datasets',
+		render: () => <Tab.Pane loading={datasetsLoading}>
+			{datasetsError && <>Datasets Error</>}
+			{datasets && <DatasetList datasets={datasets}/>}
+		</Tab.Pane>
+	}, {
+		menuItem: 'Feature Views',
+		render: () => <Tab.Pane loading={featureViewsLoading}>
+			{featureViewsError && <>Feature Views Error</>}
+			{featureViews && <FeatureViewList featureViews={featureViews} />}
+			<NavLink to='/feature-views/create'>
+				<Button icon inverted color='green'>
+					<Icon name='plus circle' />
+					New..
+				</Button>
+				</NavLink>
+		</Tab.Pane>
+	}];
+
+	return (
+		<Router>
+			<Layout.Header>
+				<div>
+					<h1>EDA on Feature Store</h1>
+					2021 Fall CID Project
+				</div>
+			</Layout.Header>
+
+			<Layout.Body>
+				<Layout.SideBar>
+					<Tab menu={{ secondary: true, pointing: true }} panes={panes} />
+				</Layout.SideBar>
+				<Layout.Main>
+					<Route
+						path={`/datasets/:dataset_name`}
+						render={(props) =>
+							<DatasetInfo {...props} key={props.match.url} />
+						}
+					/>
+					<Route
+						path={`/feature-views/info/:feature_view_name`}
+						render={(props) =>
+							<FeatureViewInfo {...props} key={props.match.url} />
+						}
+					/>
+					<Route
+						path={`/feature-views/create`}
+						component={FeatureViewCreate}
+					/>
+				</Layout.Main>
+			</Layout.Body>
+		</Router>
+	);
 }
 
 export default App;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAsync } from 'react-async';
 import { URL_BASE, Statistic } from './';
+import { Button, Divider, Table } from 'semantic-ui-react';
 
 async function getFeatureViewInfo({ featureViewName }) {
     const resp = await axios.get(
@@ -12,13 +13,6 @@ async function getFeatureViewInfo({ featureViewName }) {
 
 function FeatureViewInfo({ match }) {
     const featureViewName = match.params.feature_view_name;
-    const columns = [
-        'Name',
-        'Dataset',
-        'Column',
-        'Data Type',
-        'Feature Type'
-    ];
 
     const [featureName, setFeatureName] = useState(null);
     
@@ -33,31 +27,38 @@ function FeatureViewInfo({ match }) {
         <>
             <h2>{featureViewInfo.name}</h2>
             <h3>Features</h3>
-            <table border='1'>
-                <thead>
-                    <tr>
-                        {columns.map((column) =>
-                            <th key={column}>{column}</th>
-                        )}
-                    </tr>
-                </thead>
-                <tbody>
+            <Table celled striped selectable compact>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell>Name</Table.HeaderCell>
+                        <Table.HeaderCell>Dataset</Table.HeaderCell>
+                        <Table.HeaderCell>Column</Table.HeaderCell>
+                        <Table.HeaderCell>Data Type</Table.HeaderCell>
+                        <Table.HeaderCell>Feature Type</Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
                     {featureViewInfo.features.map(feature => (
-                        <tr key={feature.name}>
-                            <td>
-                                <button onClick={() => setFeatureName(feature.name)} >
+                        <Table.Row
+                            key={feature.name}
+                            active={feature.name === featureName}
+                        >
+                            <Table.Cell>
+                                <Button
+                                    onClick={() => setFeatureName(feature.name)}
+                                >
                                     {feature.name}
-                                </button>
-                            </td>
-                            <td>{feature.dataset_name}</td>
-                            <td>{feature.column_name}</td>
-                            <td>{feature.data_type}</td>
-                            <td>{feature.feature_type}</td>
-                        </tr>
+                                </Button>
+                            </Table.Cell>
+                            <Table.Cell>{feature.dataset_name}</Table.Cell>
+                            <Table.Cell>{feature.column_name}</Table.Cell>
+                            <Table.Cell>{feature.data_type}</Table.Cell>
+                            <Table.Cell>{feature.feature_type}</Table.Cell>
+                        </Table.Row>
                     ))}
-                </tbody>
-            </table>
-
+                </Table.Body>
+            </Table>
+            <Divider />
             {featureName &&
                 <Statistic
                     featureViewName={featureViewName}

@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import axios from 'axios';
 import { URL_BASE } from '.';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { Table, Input, Dropdown, Button, Modal } from 'semantic-ui-react';
+import { Table, Input, Dropdown, Button, Modal, Icon } from 'semantic-ui-react';
 
 // TODO:
 // show data type of currently selected columns
@@ -155,7 +155,7 @@ function FeatureViewCreate() {
                 />}
             />
             <h2>Features</h2>
-            <Table celled striped definition>
+            <Table celled striped definition compact>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell />
@@ -205,10 +205,10 @@ function FeatureViewCreate() {
                                 />
                             </Table.Cell>
                             <Table.Cell textAlign='center'>
-                                <Button type='button'
-                                    negative
+                                <Button type='button' icon inverted color='red'
                                     onClick={() => remove(index)}
                                 >
+                                    <Icon name='times circle'/>
                                     Delete
                                 </Button>
                             </Table.Cell>
@@ -219,7 +219,7 @@ function FeatureViewCreate() {
                 <Table.Footer>
                     <Table.Row>
                         <Table.Cell colSpan='6'>
-                            <Button type='button'
+                            <Button type='button' icon color='grey'
                                 onClick={() => append({
                                     name: '',
                                     dataset_name: '',
@@ -228,6 +228,7 @@ function FeatureViewCreate() {
                                 })}
                                 floated='right'
                             >
+                                <Icon name='angle down' />
                                 Add
                             </Button>
                         </Table.Cell>
@@ -235,7 +236,10 @@ function FeatureViewCreate() {
                 </Table.Footer>
 
             </Table>
-            <Button type='submit' positive>Submit</Button>
+            <Button type='submit' icon positive>
+                <Icon name='check circle' />
+                Submit
+            </Button>
             <Modal
                 centered={false}
                 open={submitted}
