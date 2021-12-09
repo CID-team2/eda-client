@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useAsync } from 'react-async';
 import { BrowserRouter as Router, NavLink, Route } from 'react-router-dom';
@@ -9,7 +9,7 @@ import {
 	FeatureViewCreate
 } from './pages';
 import * as Layout from './Layout';
-import { Button, Icon, List, Tab } from 'semantic-ui-react';
+import { Button, Icon, List, Modal, Tab } from 'semantic-ui-react';
 
 // TODO:
 // add search on sidebars
@@ -29,7 +29,7 @@ const DatasetList = ({ datasets }) => {
 					<NavLink
 						to={`/datasets/${datasetName}`}
 						style={isActive => ({
-							color: isActive ? 'black' : 'gray',
+							color: isActive ? 'black' : 'grey',
 							fontWeight: isActive ? 'bold' : 'normal'
 						})}
 					>
@@ -48,24 +48,70 @@ async function getFeatureViews() {
     return resp.data;
 }
 
-const FeatureViewList = ({ featureViews }) => {
-    return(
+const FeatureViewList = ({ featureViews, reload }) => {
+	const [deleteMode, setDeleteMode] = useState(false);
+	const [submitted, setSubmitted] = useState(false);
+
+	const deleteFeatureView = (featureViewName) => {
+        axios.delete(`${URL_BASE}/feature-views/${featureViewName}`)
+        .then((response) => {
+            if (response.status === 204) {
+                setSubmitted(true);
+            }
+        })
+        .catch((error) => { console.log(error); });
+    };
+
+    return(<>
 		<List selection divided>
 			{featureViews.map(featureViewName => (
 				<List.Item key={featureViewName}>
 					<NavLink
 						to={`/feature-views/info/${featureViewName}`}
 						style={isActive => ({
-							color: isActive ? 'black' : 'gray',
+							color: isActive ? 'black' : 'grey',
 							fontWeight: isActive ? 'bold' : 'normal'
 						})}
 					>
 						{featureViewName}
 					</NavLink>
+					{deleteMode && <Button
+						floated='right' color='red' icon='minus'
+						onClick={() => deleteFeatureView(featureViewName)}
+					/>}
 				</List.Item>
 			))}
 		</List>
-    );
+		{deleteMode || <NavLink to='/feature-views/create'>
+			<Button icon inverted color='green'>
+				<Icon name='plus circle' />
+				New..
+			</Button>
+		</NavLink>}
+		{deleteMode ? <Button icon color='grey'
+			onClick={() => setDeleteMode(false)}
+		>
+			<Icon name='chevron circle left' />
+			Cancel..
+		</Button> : <Button icon color='red' inverted
+			onClick={() => setDeleteMode(true)}
+		>
+			<Icon name='minus circle' />
+			Delete..
+		</Button>}
+		<Modal
+			centered={false}
+			open={submitted}
+			onClose={() => {
+				setSubmitted(false);
+				reload();
+			}}
+			closeOnDimmerClick={false}
+			header='Success!'
+			content='The feature view is successfully deleted.'
+			actions={[{ key: 'confirm', content: 'Confirm', positive: true }]}
+		/>
+	</>);
 }
 
 const App = () => {
@@ -77,25 +123,22 @@ const App = () => {
 	const {
 		data: featureViews,
 		featureViewsError,
-		featureViewsLoading
+		featureViewsLoading,
+		reload: featureViewsReload
 	} = useAsync({ promiseFn: getFeatureViews });
 	const panes = [{
 		menuItem: 'Datasets',
-		render: () => <Tab.Pane loading={datasetsLoading}>
+		render: () =>
+		<Tab.Pane loading={datasetsLoading}>
 			{datasetsError && <>Datasets Error</>}
 			{datasets && <DatasetList datasets={datasets}/>}
 		</Tab.Pane>
 	}, {
 		menuItem: 'Feature Views',
-		render: () => <Tab.Pane loading={featureViewsLoading}>
+		render: () =>
+		<Tab.Pane loading={featureViewsLoading}>
 			{featureViewsError && <>Feature Views Error</>}
-			{featureViews && <FeatureViewList featureViews={featureViews} />}
-			<NavLink to='/feature-views/create'>
-				<Button icon inverted color='green'>
-					<Icon name='plus circle' />
-					New..
-				</Button>
-				</NavLink>
+			{featureViews && <FeatureViewList featureViews={featureViews} reload={featureViewsReload}/>}
 		</Tab.Pane>
 	}];
 
@@ -103,7 +146,7 @@ const App = () => {
 		<Router>
 			<Layout.Header>
 				<div>
-					<h1>EDA on Feature Store</h1>
+					<h1>EDA for Feature Store</h1>
 					2021 Fall CID Project
 				</div>
 			</Layout.Header>
@@ -127,7 +170,9 @@ const App = () => {
 					/>
 					<Route
 						path={`/feature-views/create`}
-						component={FeatureViewCreate}
+						render={(props) =>
+							<FeatureViewCreate {...props} reload={featureViewsReload} />
+						}
 					/>
 				</Layout.Main>
 			</Layout.Body>

@@ -95,7 +95,7 @@ const FeatureTypeDropdown = ({ index, control, setValue }) => {
     );
 };
 
-function FeatureViewCreate() {
+function FeatureViewCreate({ reload }) {
     const [loading, setLoading] = useState(true);
     const [datasets, setDatasets] = useState();
     const [submitted, setSubmitted] = useState(false);
@@ -243,7 +243,10 @@ function FeatureViewCreate() {
             <Modal
                 centered={false}
                 open={submitted}
-                onClose={() => setSubmitted(false)}
+                onClose={() => {
+                    setSubmitted(false);
+                    reload();
+                }}
                 closeOnDimmerClick={false}
                 header='Success!'
                 content='Your feature view is successfully created.'
