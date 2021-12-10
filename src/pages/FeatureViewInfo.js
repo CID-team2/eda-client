@@ -26,7 +26,12 @@ function FeatureViewInfo({ match }) {
     if (featureViewInfo) return(
         <>
             <h2>{featureViewInfo.name}</h2>
-            <h3>Features</h3>
+            {featureName &&
+                <Statistic
+                featureViewName={featureViewName}
+                featureName={featureName}
+                />}
+            <Divider />
             <Table celled striped selectable compact>
                 <Table.Header>
                     <Table.Row>
@@ -58,13 +63,6 @@ function FeatureViewInfo({ match }) {
                     ))}
                 </Table.Body>
             </Table>
-            <Divider />
-            {featureName &&
-                <Statistic
-                    featureViewName={featureViewName}
-                    featureName={featureName}
-                />
-            }
         </>
     );
     return null;

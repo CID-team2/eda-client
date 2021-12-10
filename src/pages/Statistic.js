@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { URL_BASE } from './';
 import * as Charts from '../charts';
+import { Button } from 'semantic-ui-react';
+
+const chartTypeToParam = {
+    'box':      'boxplot',
+    'hist':     'histogram',
+    'bar':      'barplot',
+    'pie':      'barplot',
+    // 'heatmap':  'corr_matrix',
+    // 'scatter':  'scatter_plot'
+};
 
 function Statistic({ featureViewName, featureName }) {
     const [basicLoading, setBasicLoading] = useState(false);
@@ -15,7 +25,7 @@ function Statistic({ featureViewName, featureName }) {
             setBasicLoading(true);
             try {
                 const response = await axios.get(
-                    `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}`
+    `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}`
                 );
                 setBasicStat(response.data);
             } catch (e) {
@@ -33,7 +43,7 @@ function Statistic({ featureViewName, featureName }) {
             try {
                 if (chartType) {
                     const response = await axios.get(
-                        `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}&statistic=${chartType}`
+    `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}&statistic=${chartTypeToParam[chartType]}`
                     );
                     setChartStat(response.data);
                 }
@@ -53,35 +63,43 @@ function Statistic({ featureViewName, featureName }) {
 
     return(
         <>
-            {/* TODO: chart options (e.g., a dropdown menu) */}
-            {/* an array of buttons for now... */}
-            <p>
-                <button onClick={() => handleChartChange('boxplot')}>
-                    Boxplot
-                </button>
-                <button onClick={() => handleChartChange('histogram')}>
-                    Histogram
-                </button>
-            </p>
             <>
-                {basicLoading ? <>Loading basic statistic...</> :
-                    basicStat && <>
-                        {Object.keys(basicStat).map((stat) =>
-                            <div>
-                                <strong>{stat}: </strong>
-                                {basicStat[stat] !== null ? basicStat[stat] : 'Unknown'}
-                            </div>
-                        )}
-                    </>
-                }
+                <Button.Group widths='4'>
+                    <Button onClick={() => handleChartChange('box')}>
+                        Boxplot
+                    </Button>
+                    <Button onClick={() => handleChartChange('hist')}>
+                        Histogram
+                    </Button>
+                    <Button onClick={() => handleChartChange('bar')}>
+                        Bar
+                    </Button>
+                    <Button onClick={() => handleChartChange('pie')}>
+                        Pie
+                    </Button>
+                </Button.Group>
             </>
             <>
                 {chartLoading ? <>Loading chart...</> :
                     chartStat &&
                         <div>
-                            {chartType === 'boxplot' && <Charts.Boxplot dict={chartStat} />}
-                            {chartType === 'histogram' && <Charts.Histogram dict={chartStat} />}
+                            {chartType === 'box' && <Charts.Boxplot dict={chartStat} />}
+                            {chartType === 'hist' && <Charts.Histogram dict={chartStat} />}
+                            {chartType === 'bar' && <Charts.BarChart dict={chartStat} />}
+                            {chartType === 'pie' && <Charts.PieChart dict={chartStat} />}
                         </div>
+                }
+            </>
+            <>
+                {basicLoading ? <>Loading basic statistic...</> :
+                    basicStat && <>
+                        {Object.keys(basicStat).map((stat) =>
+                            <div key={stat}>
+                                <strong>{stat}: </strong>
+                                {basicStat[stat] !== null ? basicStat[stat] : 'Unknown'}
+                            </div>
+                        )}
+                    </>
                 }
             </>
         </>
