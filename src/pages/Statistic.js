@@ -9,11 +9,12 @@ const chartTypeToParam = {
     'hist':     'histogram',
     'bar':      'barplot',
     'pie':      'barplot',
-    // 'heatmap':  'corr_matrix',
+    'heatmap':  'corr_matrix',
     // 'scatter':  'scatter_plot'
 };
+const singleFeatureChart = ['box', 'hist', 'bar', 'pie'];
 
-function Statistic({ featureViewName, featureName }) {
+function Statistic({ featureViewName, featureName, featureNames }) {
     const [basicLoading, setBasicLoading] = useState(false);
     const [chartLoading, setChartLoading] = useState(false);
     const [basicStat, setBasicStat] = useState(null);
@@ -22,6 +23,8 @@ function Statistic({ featureViewName, featureName }) {
 
     useEffect(() => {
         async function getBasicStatistic() {
+            if (!featureName)
+                return;
             setBasicLoading(true);
             try {
                 const response = await axios.get(
@@ -41,10 +44,40 @@ function Statistic({ featureViewName, featureName }) {
         async function getChartStatistic() {
             setChartLoading(true);
             try {
-                if (chartType) {
+                if (singleFeatureChart.includes(chartType)) {
+                    if (!featureName) {
+                        setChartLoading(false);
+                        return;
+                    }
                     const response = await axios.get(
     `${URL_BASE}/feature-views/${featureViewName}/statistic?feature=${featureName}&statistic=${chartTypeToParam[chartType]}`
                     );
+                    setChartStat(response.data);
+                }
+                else if (chartType === 'heatmap') {
+                    if (featureNames.size < 2) {
+                        setChartLoading(false);
+                        return;
+                    }
+                    let url = `${URL_BASE}/feature-views/${featureViewName}/statistic?`;
+                    featureNames.forEach(name => {
+                        url = url + `feature=${name}&`;
+                    });
+                    url = url + `statistic=${chartTypeToParam[chartType]}`;
+                    const response = await axios.get(url);
+                    setChartStat(response.data);
+                }
+                else if (chartType === 'scatter') {
+                    if (featureNames.size !== 2) {
+                        setChartLoading(false);
+                        return;
+                    }
+                    let url = `${URL_BASE}/feature-views/${featureViewName}/example?`;
+                    featureNames.forEach(name => {
+                        url = url + `feature=${name}&`;
+                    });
+                    url = url + `count=100&random=true`;
+                    const response = await axios.get(url);
                     setChartStat(response.data);
                 }
             } catch (e) {
@@ -54,7 +87,7 @@ function Statistic({ featureViewName, featureName }) {
             setChartLoading(false);
         };
         getChartStatistic();
-    }, [featureViewName, featureName, chartType]);
+    }, [featureViewName, featureName, featureNames, chartType]);
 
     const handleChartChange = (type) => {
         setChartStat(null);
@@ -64,7 +97,7 @@ function Statistic({ featureViewName, featureName }) {
     return(
         <>
             <>
-                <Button.Group widths='4'>
+                <Button.Group widths='6'>
                     <Button onClick={() => handleChartChange('box')}>
                         Boxplot
                     </Button>
@@ -77,6 +110,12 @@ function Statistic({ featureViewName, featureName }) {
                     <Button onClick={() => handleChartChange('pie')}>
                         Pie
                     </Button>
+                    <Button onClick={() => handleChartChange('heatmap')}>
+                        Heatmap
+                    </Button>
+                    <Button onClick={() => handleChartChange('scatter')}>
+                        Scatter
+                    </Button>
                 </Button.Group>
             </>
             <>
@@ -87,6 +126,8 @@ function Statistic({ featureViewName, featureName }) {
                             {chartType === 'hist' && <Charts.Histogram dict={chartStat} />}
                             {chartType === 'bar' && <Charts.BarChart dict={chartStat} />}
                             {chartType === 'pie' && <Charts.PieChart dict={chartStat} />}
+                            {chartType === 'heatmap' && <Charts.Heatmap dict={chartStat} />}
+                            {chartType === 'scatter' && <Charts.ScatterChart dict={chartStat} />}
                         </div>
                 }
             </>

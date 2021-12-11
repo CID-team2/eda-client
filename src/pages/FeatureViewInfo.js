@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAsync } from 'react-async';
 import { URL_BASE, Statistic } from './';
-import { Button, Divider, Table } from 'semantic-ui-react';
+import { Button, Checkbox, Divider, Table } from 'semantic-ui-react';
 
 async function getFeatureViewInfo({ featureViewName }) {
     const resp = await axios.get(
@@ -21,16 +21,19 @@ function FeatureViewInfo({ match }) {
         featureViewName
     });
 
+    let featureNames = new Set([]);
+    let selected = {};
+    
     if (isLoading) return <>Loading FeatureViewInfo...</>;
     if (error) return <>FeatureViewInfo Error!</>;
     if (featureViewInfo) return(
         <>
             <h2>{featureViewInfo.name}</h2>
-            {featureName &&
-                <Statistic
+            <Statistic
                 featureViewName={featureViewName}
                 featureName={featureName}
-                />}
+                featureNames={featureNames}
+            />
             <Divider />
             <Table celled striped selectable compact>
                 <Table.Header>
@@ -54,6 +57,15 @@ function FeatureViewInfo({ match }) {
                                 >
                                     {feature.name}
                                 </Button>
+                                <Checkbox toggle
+                                    onClick={() => {
+                                        if (featureNames.has(feature.name))
+                                            featureNames.delete(feature.name);
+                                        else featureNames.add(feature.name);
+                                        selected[feature.name] = !selected[feature.name];
+                                    }}
+                                    checked={selected[feature.name]}
+                                />
                             </Table.Cell>
                             <Table.Cell>{feature.dataset_name}</Table.Cell>
                             <Table.Cell>{feature.column_name}</Table.Cell>

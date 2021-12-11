@@ -40,12 +40,14 @@ const ColumnNameDropdown = ({ index, control, setValue }) => {
                 const response = await axios.get(
                     `${URL_BASE}/datasets/${watch}`
                 );
-                const columnNameOptions = response.data.columns.map((column) => { return {
-                    key: column.name,
-                    text: column.name,
-                    value: column.name
-                }})
-                setOptions(columnNameOptions);
+                if (watch) {
+                    const columnNameOptions = response.data.columns.map((column) => { return {
+                        key: column.name,
+                        text: column.name,
+                        value: column.name
+                    }})
+                    setOptions(columnNameOptions);
+                }
             } catch (e) {
                 setLoading(false);
                 console.log(e);
