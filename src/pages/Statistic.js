@@ -17,6 +17,7 @@ const singleFeatureChart = ['box', 'hist', 'bar', 'pie'];
 function Statistic({ featureViewName, featureName, featureNames }) {
     const [basicLoading, setBasicLoading] = useState(false);
     const [chartLoading, setChartLoading] = useState(false);
+    const [chartError, setChartError] = useState(null);
     const [basicStat, setBasicStat] = useState(null);
     const [chartStat, setChartStat] = useState(null);
     const [chartType, setChartType] = useState(null);
@@ -42,6 +43,7 @@ function Statistic({ featureViewName, featureName, featureNames }) {
 
     useEffect(() => {
         async function getChartStatistic() {
+            setChartError(null);
             setChartLoading(true);
             try {
                 if (singleFeatureChart.includes(chartType)) {
@@ -55,10 +57,6 @@ function Statistic({ featureViewName, featureName, featureNames }) {
                     setChartStat(response.data);
                 }
                 else if (chartType === 'heatmap') {
-                    if (featureNames.size < 2) {
-                        setChartLoading(false);
-                        return;
-                    }
                     let url = `${URL_BASE}/feature-views/${featureViewName}/statistic?`;
                     featureNames.forEach(name => {
                         url = url + `feature=${name}&`;
@@ -69,6 +67,7 @@ function Statistic({ featureViewName, featureName, featureNames }) {
                 }
                 else if (chartType === 'scatter') {
                     if (featureNames.size !== 2) {
+                        setChartError("The scatter plot requires exactly 2 features");
                         setChartLoading(false);
                         return;
                     }
@@ -81,8 +80,9 @@ function Statistic({ featureViewName, featureName, featureNames }) {
                     setChartStat(response.data);
                 }
             } catch (e) {
-                setChartLoading(false);
-                return <>Chart Statistic Error!</>
+                console.log(e);
+                if (e.response.status === 400)
+                    setChartError(e.response.data.message);
             }
             setChartLoading(false);
         };
@@ -120,6 +120,7 @@ function Statistic({ featureViewName, featureName, featureNames }) {
             </>
             <>
                 {chartLoading ? <>Loading chart...</> :
+                    chartError ? chartError :
                     chartStat &&
                         <div>
                             {chartType === 'box' && <Charts.Boxplot dict={chartStat} />}
