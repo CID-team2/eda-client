@@ -4,6 +4,17 @@ import HighchartsMore from 'highcharts/highcharts-more'
 
 HighchartsMore(Highcharts);
 
+const getOutliers = (dict) => {
+    let ret = [];
+    let outliers = dict.lowerOutliers.concat(dict.upperOutliers);
+    let length = outliers.length;
+    if (length > 100)
+        for (let i = 0; i < length; i += length/100)
+            ret.push(outliers[parseInt(i)]);
+    else ret = outliers;
+    return ret;
+}
+
 function Boxplot({ dict }) {
     return(<HighchartsReact highcharts={Highcharts}
         options={{
@@ -37,7 +48,7 @@ function Boxplot({ dict }) {
                 color: Highcharts.getOptions().colors[0],
                 type: 'scatter',
                 data:  // x, y positions where 0 is the first category
-                    dict.lowerOutliers.concat(dict.upperOutliers).map(x => [0, x])
+                    getOutliers(dict).map(x => [0, x])
                 ,
                 marker: {
                     fillColor: 'white',
